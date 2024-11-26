@@ -1,0 +1,19 @@
+.react-datepicker {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .react-datepicker__current-month {
+    color: #1d4ed8; /* Azul oscuro */
+    font-weight: bold;
+  }
+  
+  .react-datepicker__day--selected {
+    background-color: #4ade80; /* Verde claro */
+    color: white;
+  }
+  
+  .react-datepicker__day--keyboard-selected {
+    background-color: #60a5fa; /* Azul claro */
+    color: white;
+  }
+  

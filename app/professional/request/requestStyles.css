@@ -1,0 +1,21 @@
+.container {
+    font-family: Arial, sans-serif;
+  }
+  
+  .bg-white {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .bg-white:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  button {
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    transform: scale(1.05);
+  }
+  
