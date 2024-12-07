@@ -1,20 +1,22 @@
-"use client";
-
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import ResetPasswordForm from '@../../../components/Auth/ResetPasswordForm';
 
-export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
-  const [token, setToken] = useState(null);
+export async function getServerSideProps(context) {
+  const { query } = context;
 
-  useEffect(() => {
-    const queryToken = searchParams.get('token');
-    setToken(queryToken);
-  }, [searchParams]);
+  // Verifica si existe el token
+  if (!query.token) {
+    return {
+      notFound: true, // Devuelve una página 404 si no hay token
+    };
+  }
 
-  // Si el token no está presente, muestra un mensaje amigable
-  if (!token) return <div>No se encontró un token válido. Verifica el enlace.</div>;
+  return {
+    props: {
+      token: query.token, // Pasa el token como prop al componente
+    },
+  };
+}
 
+export default function ResetPasswordPage({ token }) {
   return <ResetPasswordForm token={token} />;
 }
