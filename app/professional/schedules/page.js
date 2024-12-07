@@ -49,7 +49,7 @@ export default function ProfessionalSchedulePage() {
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        "http://localhost:3001/api/schedules",
+        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/schedules",
         { date, times: formattedTimes },
         { headers: { Authorization: `Bearer ${token}` } }
       );

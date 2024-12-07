@@ -10,7 +10,7 @@ export default function NotificationsPage() {
     const fetchNotifications = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await axios.get("http://localhost:3001/api/notifications", {
+        const response = await axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/notifications", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setNotifications(response.data);

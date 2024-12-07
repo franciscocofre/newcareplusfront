@@ -16,7 +16,7 @@ export default function AdminUserPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3001/api/users", {
+      const response = await axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(response.data);

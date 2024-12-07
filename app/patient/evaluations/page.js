@@ -21,7 +21,7 @@ export default function PatientEvaluationsPage() {
 
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/appointments/patient/completed",
+          "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments/patient/completed",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -51,7 +51,7 @@ export default function PatientEvaluationsPage() {
 
     try {
       await axios.post(
-        "http://localhost:3001/api/evaluations",
+        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/evaluations",
         {
           appointmentId: selectedAppointment,
           rating,

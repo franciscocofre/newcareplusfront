@@ -27,10 +27,10 @@ export default function AppointmentsPage() {
       try {
         const token = localStorage.getItem("token");
         const [availabilityRes, topProfessionalsRes] = await Promise.all([
-          axios.get("http://localhost:3001/api/reports/top-availability", {
+          axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/reports/top-availability", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3001/api/reports/top-professionals", {
+          axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/reports/top-professionals", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

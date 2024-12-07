@@ -20,7 +20,7 @@ export default function PatientDashboard() {
       }
 
       try {
-        const response = await axios.get("http://localhost:3001/api/users/info", {
+        const response = await axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/users/info", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

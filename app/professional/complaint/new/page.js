@@ -23,7 +23,7 @@ export default function NewComplaintPage() {
 
     try {
       await axios.post(
-        "http://localhost:3001/api/complaints",
+        "hhttps://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/complaints",
         { title, description },
         {
           headers: { Authorization: `Bearer ${token}` },

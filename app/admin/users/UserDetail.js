@@ -11,7 +11,7 @@ export default function UserDetail({ user, onClose, onUpdate }) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:3001/api/users/${user.id}`,
+        `https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/users/${user.id}`,
         { name, email, role },
         {
           headers: { Authorization: `Bearer ${token}` },

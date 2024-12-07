@@ -19,7 +19,7 @@ export default function PatientComplaintsPage() {
       }
 
       try {
-        const response = await axios.get("http://localhost:3001/api/complaints", {
+        const response = await axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/complaints", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setComplaints(response.data);

@@ -33,7 +33,7 @@ export default function ResetPasswordForm() {
     }
 
     try {
-      await axios.post("http://localhost:3001/api/auth/reset-password", {
+      await axios.post("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/auth/reset-password", {
         token,
         newPassword,
       });

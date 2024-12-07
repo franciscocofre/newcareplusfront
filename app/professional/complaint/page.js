@@ -14,7 +14,7 @@ export default function ProfessionalComplaintsPage() {
       const token = localStorage.getItem("token");
   
       try {
-        const response = await axios.get("http://localhost:3001/api/complaints/professional", {
+        const response = await axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/complaints/professional", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setComplaints(response.data);

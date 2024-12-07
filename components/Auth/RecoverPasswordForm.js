@@ -16,7 +16,7 @@ export default function RecoverPasswordForm() {
     setMessage('');
 
     try {
-      const response = await axios.post('http://localhost:3001/api/auth/recover-password', { email });
+      const response = await axios.post('https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/auth/recover-password', { email });
       setMessage('Correo de recuperación enviado. Revisa tu bandeja de entrada.');
     } catch (error) {
       setError(error.response?.data?.error || 'Error al enviar correo de recuperación.');

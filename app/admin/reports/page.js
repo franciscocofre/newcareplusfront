@@ -29,10 +29,10 @@ export default function ReportsPage() {
       try {
         const token = localStorage.getItem("token");
         const [totalEarningsRes, totalRevenueRes] = await Promise.all([
-          axios.get("http://localhost:3001/api/reports/total-earnings", {
+          axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/reports/total-earnings", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3001/api/reports/total-revenue", {
+          axios.get("https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/reports/total-revenue", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
