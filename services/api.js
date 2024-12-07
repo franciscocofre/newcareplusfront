@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api',
+  baseURL: 'https://newcareplusback.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },

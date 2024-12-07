@@ -6,15 +6,15 @@ import ResetPasswordForm from '@../../../components/Auth/ResetPasswordForm';
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
-  const [queryParams, setQueryParams] = useState(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    setQueryParams(searchParams.get('token')); // Obtén el token desde los parámetros de consulta
+    const queryToken = searchParams.get('token');
+    setToken(queryToken);
   }, [searchParams]);
 
-  // Renderizar un mensaje de carga mientras se obtienen los parámetros
-  if (!queryParams) return <div>Cargando...</div>;
+  // Si el token no está presente, muestra un mensaje amigable
+  if (!token) return <div>No se encontró un token válido. Verifica el enlace.</div>;
 
-  // Pasa el token al formulario de restablecimiento de contraseña
-  return <ResetPasswordForm token={queryParams} />;
+  return <ResetPasswordForm token={token} />;
 }
