@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import ResetPasswordForm from '@../../../components/Auth/ResetPasswordForm';
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const searchParams = useSearchParams();
   const [token, setToken] = useState(null);
 
@@ -13,8 +13,15 @@ export default function ResetPasswordPage() {
     setToken(queryToken);
   }, [searchParams]);
 
-  // Renderiza un mensaje de carga mientras se obtiene el token
   if (!token) return <div>Cargando...</div>;
 
   return <ResetPasswordForm token={token} />;
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Cargando página...</div>}>
+      <ResetPasswordPageContent />
+    </Suspense>
+  );
 }
