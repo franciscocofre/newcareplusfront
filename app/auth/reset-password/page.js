@@ -9,11 +9,12 @@ export default function ResetPasswordPage() {
   const [queryParams, setQueryParams] = useState(null);
 
   useEffect(() => {
-    setQueryParams(searchParams);
+    setQueryParams(searchParams.get('token')); // Obtén el token desde los parámetros de consulta
   }, [searchParams]);
 
-  // Evitar renderizado hasta que los parámetros estén listos
-  if (!queryParams) return null;
+  // Renderizar un mensaje de carga mientras se obtienen los parámetros
+  if (!queryParams) return <div>Cargando...</div>;
 
-  return <ResetPasswordForm searchParams={queryParams} />;
+  // Pasa el token al formulario de restablecimiento de contraseña
+  return <ResetPasswordForm token={queryParams} />;
 }
