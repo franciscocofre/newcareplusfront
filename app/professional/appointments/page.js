@@ -21,7 +21,7 @@ export default function ProfessionalAppointmentsPage() {
       }
 
       try {
-        const response = await axios.get('https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments/professional/simplified', {
+        const response = await axios.get('https://newcareplusback.onrender.com/api/appointments/professional/simplified', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAppointments(response.data);

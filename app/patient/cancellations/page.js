@@ -21,7 +21,7 @@ export default function PatientAppointmentsPage() {
 
       try {
         const response = await axios.get(
-          "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments/patient/simplified",
+          "https://newcareplusback.onrender.com/api/appointments/patient/simplified",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -51,7 +51,7 @@ export default function PatientAppointmentsPage() {
 
     try {
       await axios.post(
-        "hhttps://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments/cancel",
+        "https://newcareplusback.onrender.com/api/appointments/cancel",
         {
           appointment_id: appointmentId,
           cancellation_reason: cancellationReason,

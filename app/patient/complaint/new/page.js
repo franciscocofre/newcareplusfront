@@ -23,7 +23,7 @@ export default function NewComplaintPage() {
 
     try {
       await axios.post(
-        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/complaints",
+        "https://newcareplusback.onrender.com/api/complaints",
         { title, description },
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -17,7 +17,7 @@ export default function ProfessionalEvaluations() {
       if (!token) throw new Error("Token no encontrado");
 
       const response = await axios.get(
-        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/evaluations/professional/2",
+        "https://newcareplusback.onrender.com/api/evaluations/professional/2",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -37,7 +37,7 @@ export default function ProfessionalEvaluations() {
       if (!token) throw new Error("Token no encontrado");
 
       const response = await axios.get(
-        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/evaluations/details",
+        "https://newcareplusback.onrender.com/api/evaluations/details",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -57,7 +57,7 @@ export default function ProfessionalEvaluations() {
       if (!token) throw new Error("Token no encontrado");
 
       const response = await axios.get(
-        `https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/reports/total-earnings?month=${month}`,
+        `https://newcareplusback.onrender.com/api/reports/total-earnings?month=${month}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

@@ -23,7 +23,7 @@ export default function ProfessionalRequestPage() {
 
       try {
         const response = await axios.get(
-          "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments/professional/cancel-requests",
+          "https://newcareplusback.onrender.com/api/appointments/professional/cancel-requests",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -52,7 +52,7 @@ export default function ProfessionalRequestPage() {
 
     try {
       const response = await axios.put(
-        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments/cancel-handle",
+        "https://newcareplusback.onrender.com/api/appointments/cancel-handle",
         { appointmentId, action },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -20,7 +20,7 @@ export default function AdminComplaintPage() {
 
     try {
       const response = await axios.get(
-        `https://newcarefront-h4h7euekdvhacydv.centralus-01.azurewebsites.net/api/complaints/with-users${filterRole ? `?role=${filterRole}` : ""}`,
+        `https://newcareplusback.onrender.com/api/complaints/with-users${filterRole ? `?role=${filterRole}` : ""}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setComplaints(response.data);
@@ -44,7 +44,7 @@ export default function AdminComplaintPage() {
 
     try {
       await axios.put(
-        `https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/complaints/${id}/response`,
+        `https://newcareplusback.onrender.com/api/complaints/${id}/response`,
         { response: responseText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -62,7 +62,7 @@ export default function AdminComplaintPage() {
 
     try {
       await axios.put(
-        `https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/complaints/${id}/close`,
+        `https://newcareplusback.onrender.com/api/complaints/${id}/close`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

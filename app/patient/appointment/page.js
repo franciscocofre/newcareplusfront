@@ -31,7 +31,7 @@ export default function PatientAppointmentPage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
+        `https://newcareplusback.onrender.com/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProfessionals(response.data.professionals);
@@ -48,7 +48,7 @@ export default function PatientAppointmentPage() {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        `https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/schedules/${professional_id}/available-schedules`,
+        `https://newcareplusback.onrender.com/api/schedules/${professional_id}/available-schedules`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSchedules(response.data.schedules);
@@ -114,7 +114,7 @@ export default function PatientAppointmentPage() {
     try {
       // Crear la cita y obtener su ID
       const appointmentResponse = await axios.post(
-        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/appointments",
+        "https://newcareplusback.onrender.com/api/appointments",
         {
           professional_id: selectedProfessional,
           scheduled_time: selectedTimeSlot.from,
@@ -130,7 +130,7 @@ export default function PatientAppointmentPage() {
 
       // Solicitar link de pago con Flow
       const paymentResponse = await axios.post(
-        "https://newcareback-hhcsb3era0gwctg3.centralus-01.azurewebsites.net/api/payments/create-payment-link",
+        "https://newcareplusback.onrender.com/api/payments/create-payment-link",
         { appointment_id: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
