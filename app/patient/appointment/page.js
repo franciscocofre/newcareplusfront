@@ -1,10 +1,12 @@
 "use client";
 
+
 import { useState } from "react";
 import axios from "axios";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./calendarStyles.css";
+
 
 export default function PatientAppointmentPage() {
   const [specialties, setSpecialties] = useState([
@@ -22,6 +24,7 @@ export default function PatientAppointmentPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+
   const handleSearch = async () => {
     const token = localStorage.getItem("token");
     if (!selectedSpecialty) {
@@ -31,7 +34,7 @@ export default function PatientAppointmentPage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://newcareplusback.onrender.com/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
+        `https://newcareplusfront.onrender.com/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProfessionals(response.data.professionals);
@@ -44,11 +47,12 @@ export default function PatientAppointmentPage() {
     }
   };
 
+
   const fetchSchedules = async (professional_id) => {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        `https://newcareplusback.onrender.com/api/schedules/${professional_id}/available-schedules`,
+        `https://newcareplusfront.onrender.com/api/schedules/${professional_id}/available-schedules`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSchedules(response.data.schedules);
@@ -57,6 +61,7 @@ export default function PatientAppointmentPage() {
       setMessage("Error al obtener horarios.");
     }
   };
+
 
   const handleProfessionalChange = (e) => {
     const professional_id = e.target.value;
@@ -68,6 +73,7 @@ export default function PatientAppointmentPage() {
     }
   };
 
+
   const tileDisabled = ({ date, view }) => {
     if (view === "month") {
       const dayHasAvailableSlots = schedules.some((schedule) => {
@@ -78,10 +84,12 @@ export default function PatientAppointmentPage() {
     }
   };
 
+
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setSelectedTimeSlot(null);
   };
+
 
   const availableTimeSlots = schedules
     .filter((schedule) => {
@@ -96,25 +104,30 @@ export default function PatientAppointmentPage() {
       to: new Date(schedule.to),
     }));
 
+
   const handleTimeSlotSelection = (timeSlot) => {
     setSelectedTimeSlot(timeSlot);
   };
 
+
   const confirmAppointment = async (e) => {
     e.preventDefault();
+
 
     if (!selectedProfessional || !selectedTimeSlot) {
       setMessage("Selecciona un profesional, fecha y horario antes de confirmar.");
       return;
     }
 
+
     const token = localStorage.getItem("token");
     setLoading(true);
 
+
     try {
-      // Crear la cita y obtener su ID
-      const appointmentResponse = await axios.post(
-        "https://newcareplusback.onrender.com/api/appointments",
+      // Solicitar link de pago
+      const paymentResponse = await axios.post(
+        "https://newcareplusfront.onrender.com/api/payments/create-payment-link",
         {
           professional_id: selectedProfessional,
           scheduled_time: selectedTimeSlot.from,
@@ -122,18 +135,6 @@ export default function PatientAppointmentPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const { id } = appointmentResponse.data.appointment;
-
-      if (!id) {
-        throw new Error("Error al obtener el ID de la cita.");
-      }
-
-      // Solicitar link de pago con Flow
-      const paymentResponse = await axios.post(
-        "https://newcareplusback.onrender.com/api/payments/create-payment-link",
-        { appointment_id: id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
 
       // Redirigir al link de pago generado
       if (paymentResponse.data.paymentLink) {
@@ -150,6 +151,7 @@ export default function PatientAppointmentPage() {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="container mx-auto p-4 max-w-screen-lg">
@@ -171,6 +173,7 @@ export default function PatientAppointmentPage() {
           </select>
         </label>
 
+
         <button
           onClick={handleSearch}
           disabled={loading}
@@ -183,6 +186,7 @@ export default function PatientAppointmentPage() {
           {loading ? "Buscando..." : "Buscar Profesionales"}
         </button>
       </div>
+
 
       {professionals.length > 0 && (
         <div className="mt-8">
@@ -202,6 +206,7 @@ export default function PatientAppointmentPage() {
             ))}
           </select>
 
+
           {schedules.length > 0 && (
             <div className="bg-gray-100 p-6 rounded shadow">
               <h4 className="text-xl font-bold mb-2">Horarios Disponibles:</h4>
@@ -212,6 +217,7 @@ export default function PatientAppointmentPage() {
               />
             </div>
           )}
+
 
           {selectedDate && availableTimeSlots.length > 0 && (
             <div className="mt-4">
@@ -241,6 +247,7 @@ export default function PatientAppointmentPage() {
               </div>
             </div>
           )}
+
 
           {selectedTimeSlot && (
             <button
