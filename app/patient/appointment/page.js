@@ -18,6 +18,7 @@ export default function PatientAppointmentPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [selectedProfessionalDetails, setSelectedProfessionalDetails] = useState(null);
+  const [loading, setLoading] = useState(false); // Prevent duplicate clicks
 
   const handleSearch = async () => {
     const token = localStorage.getItem("token");
@@ -116,10 +117,14 @@ export default function PatientAppointmentPage() {
     }
 
     const token = localStorage.getItem("token");
+    setLoading(true); // Deshabilitar el botón después del clic
     try {
       const response = await axios.post(
         "https://newcareplusback.onrender.com/api/appointments",
-        { professional_id: parseInt(selectedProfessional), scheduled_time: selectedTimeSlot.from },
+        {
+          professional_id: parseInt(selectedProfessional),
+          scheduled_time: selectedTimeSlot.from.toISOString(), // Formato ISO para evitar inconsistencias
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setShowPopup(true);
@@ -129,6 +134,8 @@ export default function PatientAppointmentPage() {
       const errorMsg = error.response?.data?.error || "Error al agendar la cita";
       console.error("Error al crear la cita:", errorMsg);
       setMessage(errorMsg);
+    } finally {
+      setLoading(false); // Rehabilitar el botón al finalizar
     }
   };
 
@@ -154,9 +161,14 @@ export default function PatientAppointmentPage() {
 
         <button
           onClick={handleSearch}
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={loading}
+          className={`mt-4 ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-700"
+          } text-white font-bold py-2 px-4 rounded`}
         >
-          Buscar Profesionales
+          {loading ? "Buscando..." : "Buscar Profesionales"}
         </button>
       </div>
 
@@ -210,9 +222,14 @@ export default function PatientAppointmentPage() {
           {selectedTimeSlot && (
             <button
               onClick={confirmAppointment}
-              className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              disabled={loading}
+              className={`mt-4 ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-700"
+              } text-white font-bold py-2 px-4 rounded`}
             >
-              Confirmar Cita
+              {loading ? "Procesando..." : "Confirmar Cita"}
             </button>
           )}
         </div>
