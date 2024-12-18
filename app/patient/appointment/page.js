@@ -34,7 +34,7 @@ export default function PatientAppointmentPage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://newcareplusfront.onrender.com/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
+        `https://newcareplusback.onrender.com/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProfessionals(response.data.professionals);
@@ -52,7 +52,7 @@ export default function PatientAppointmentPage() {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        `https://newcareplusfront.onrender.com/api/schedules/${professional_id}/available-schedules`,
+        `https://newcareplusback.onrender.com/api/schedules/${professional_id}/available-schedules`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSchedules(response.data.schedules);
@@ -127,7 +127,7 @@ export default function PatientAppointmentPage() {
     try {
       // Solicitar link de pago
       const paymentResponse = await axios.post(
-        "https://newcareplusfront.onrender.com/api/payments/create-payment-link",
+        "https://newcareplusback.onrender.com/api/payments/create-payment-link",
         {
           professional_id: selectedProfessional,
           scheduled_time: selectedTimeSlot.from,
