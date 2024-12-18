@@ -7,7 +7,7 @@ import "react-calendar/dist/Calendar.css";
 import "./calendarStyles.css";
 
 export default function PatientAppointmentPage() {
-  const [specialties] = useState(["kinesiologo", "podologo", "terapeuta", "nutricionista"]);
+  const [specialties, setSpecialties] = useState(["kinesiologo", "podologo", "terapeuta", "nutricionista"]);
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [professionals, setProfessionals] = useState([]);
   const [selectedProfessional, setSelectedProfessional] = useState("");
@@ -15,33 +15,33 @@ export default function PatientAppointmentPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [confirmationData, setConfirmationData] = useState(null); // Para mostrar la confirmación
+  const [showPopup, setShowPopup] = useState(false);
+  const [appointmentDetails, setAppointmentDetails] = useState(null);
+  const [selectedProfessionalDetails, setSelectedProfessionalDetails] = useState(null);
 
-  // Buscar profesionales por especialidad
   const handleSearch = async () => {
     const token = localStorage.getItem("token");
-    if (!selectedSpecialty) {
-      setMessage("Selecciona una especialidad antes de buscar.");
-      return;
-    }
-    setLoading(true);
     try {
       const response = await axios.get(
         `https://newcareplusback.onrender.com/api/users/professionals/specialty?specialty=${selectedSpecialty}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setProfessionals(response.data.professionals);
+
+      const professionalsWithSchedules = await Promise.all(
+        response.data.professionals.map(async (professional) => {
+          const schedules = await fetchSchedules(professional.id);
+          return schedules.length > 0 ? professional : null;
+        })
+      );
+
+      setProfessionals(professionalsWithSchedules.filter(Boolean));
       setMessage("");
     } catch (error) {
       console.error("Error al obtener profesionales:", error);
       setMessage("Error al obtener profesionales. Intenta nuevamente.");
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Obtener horarios disponibles para un profesional
   const fetchSchedules = async (professional_id) => {
     const token = localStorage.getItem("token");
     try {
@@ -50,24 +50,34 @@ export default function PatientAppointmentPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSchedules(response.data.schedules);
+      if (response.data.schedules.length === 0) {
+        setMessage("No se encontraron horarios disponibles para este profesional.");
+      } else {
+        setMessage("");
+      }
+      return response.data.schedules;
     } catch (error) {
-      console.error("Error al obtener horarios:", error);
-      setMessage("Error al obtener horarios.");
+      const errorMsg = error?.response?.data?.error || "Error desconocido al obtener horarios";
+      console.error("Error al obtener horarios:", errorMsg);
+      setMessage(errorMsg);
+      return [];
     }
   };
 
-  // Seleccionar profesional y cargar horarios
   const handleProfessionalChange = (e) => {
     const professional_id = e.target.value;
-    setSelectedProfessional(professional_id);
     if (professional_id) {
+      setSelectedProfessional(professional_id);
+      const selectedProfessional = professionals.find((prof) => prof.id === parseInt(professional_id));
+      setSelectedProfessionalDetails(selectedProfessional); // Guarda detalles del profesional seleccionado
       fetchSchedules(professional_id);
     } else {
+      setSelectedProfessional("");
+      setSelectedProfessionalDetails(null);
       setSchedules([]);
     }
   };
 
-  // Validar fechas deshabilitadas en el calendario
   const tileDisabled = ({ date, view }) => {
     if (view === "month") {
       const dayHasAvailableSlots = schedules.some((schedule) => {
@@ -78,63 +88,47 @@ export default function PatientAppointmentPage() {
     }
   };
 
-  // Manejar cambio de fecha seleccionada
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setSelectedTimeSlot(null);
   };
 
-  // Filtrar horarios disponibles para la fecha seleccionada
   const availableTimeSlots = schedules
     .filter((schedule) => {
       const availableFrom = new Date(schedule.from);
-      return (
-        selectedDate &&
-        availableFrom.toDateString() === selectedDate.toDateString()
-      );
+      return selectedDate && availableFrom.toDateString() === selectedDate.toDateString();
     })
     .map((schedule) => ({
       from: new Date(schedule.from),
       to: new Date(schedule.to),
     }));
 
-  // Seleccionar un bloque horario
   const handleTimeSlotSelection = (timeSlot) => {
     setSelectedTimeSlot(timeSlot);
   };
 
-  // Confirmar la cita
   const confirmAppointment = async (e) => {
     e.preventDefault();
 
     if (!selectedProfessional || !selectedTimeSlot) {
-      setMessage("Selecciona un profesional, fecha y horario antes de confirmar.");
+      setMessage("Asegúrate de seleccionar un profesional, fecha y horario válidos.");
       return;
     }
 
     const token = localStorage.getItem("token");
-    setLoading(true);
-
     try {
       const response = await axios.post(
         "https://newcareplusback.onrender.com/api/appointments",
-        {
-          professional_id: selectedProfessional,
-          scheduled_time: selectedTimeSlot.from,
-        },
+        { professional_id: parseInt(selectedProfessional), scheduled_time: selectedTimeSlot.from },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      // Guardar datos de confirmación
-      setConfirmationData(response.data.appointment);
-      setMessage("Cita confirmada con éxito.");
+      setShowPopup(true);
+      setAppointmentDetails(response.data.appointment);
+      setMessage("");
     } catch (error) {
-      const errorMsg =
-        error.response?.data?.error || "Error al confirmar la cita.";
-      console.error("Error al confirmar la cita:", errorMsg);
+      const errorMsg = error.response?.data?.error || "Error al agendar la cita";
+      console.error("Error al crear la cita:", errorMsg);
       setMessage(errorMsg);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -160,22 +154,15 @@ export default function PatientAppointmentPage() {
 
         <button
           onClick={handleSearch}
-          disabled={loading}
-          className={`mt-4 ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-700"
-          } text-white font-bold py-2 px-4 rounded`}
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          {loading ? "Buscando..." : "Buscar Profesionales"}
+          Buscar Profesionales
         </button>
       </div>
 
       {professionals.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-2xl font-semibold mb-4 text-center">
-            Seleccione un Profesional
-          </h3>
+          <h3 className="text-2xl font-semibold mb-4 text-center">Seleccione un Profesional</h3>
           <select
             value={selectedProfessional}
             onChange={handleProfessionalChange}
@@ -209,20 +196,11 @@ export default function PatientAppointmentPage() {
                     key={index}
                     onClick={() => handleTimeSlotSelection(timeSlot)}
                     className={`p-2 rounded ${
-                      selectedTimeSlot === timeSlot
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-300"
+                      selectedTimeSlot === timeSlot ? "bg-blue-600 text-white" : "bg-gray-300"
                     } hover:bg-blue-400`}
                   >
-                    {timeSlot.from.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}{" "}
-                    -{" "}
-                    {timeSlot.to.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {timeSlot.from.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} -{" "}
+                    {timeSlot.to.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </button>
                 ))}
               </div>
@@ -232,27 +210,44 @@ export default function PatientAppointmentPage() {
           {selectedTimeSlot && (
             <button
               onClick={confirmAppointment}
-              disabled={loading}
-              className={`mt-4 ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-500 hover:bg-green-700"
-              } text-white font-bold py-2 px-4 rounded`}
+              className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
             >
-              {loading ? "Procesando..." : "Confirmar Cita"}
+              Confirmar Cita
             </button>
           )}
         </div>
       )}
-      {confirmationData && (
-        <div className="bg-green-100 p-4 rounded mt-4">
-          <h4 className="text-lg font-bold">Cita Confirmada</h4>
-          <p><strong>ID:</strong> {confirmationData.id}</p>
-          <p><strong>Profesional:</strong> {confirmationData.professional_id}</p>
-          <p><strong>Horario:</strong> {new Date(confirmationData.scheduled_time).toLocaleString()}</p>
+
+      {showPopup && (
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 shadow-lg max-w-md">
+            <h3 className="text-lg font-bold mb-4">Cita Confirmada</h3>
+            <p>
+              <strong>Médico:</strong> {selectedProfessionalDetails?.name || "Desconocido"}
+            </p>
+            <p>
+              <strong>Especialidad:</strong> {selectedProfessionalDetails?.specialty || "Desconocido"}
+            </p>
+            <p>
+              <strong>Fecha:</strong>{" "}
+              {new Date(appointmentDetails.scheduled_time).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Hora:</strong>{" "}
+              {new Date(appointmentDetails.scheduled_time).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+            <button
+              onClick={() => (window.location.href = "/patient")}
+              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Volver al Inicio
+            </button>
+          </div>
         </div>
       )}
-      {message && <p className="text-red-500 mt-4">{message}</p>}
     </div>
   );
 }
