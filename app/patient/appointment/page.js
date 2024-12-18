@@ -1,20 +1,13 @@
 "use client";
 
-
 import { useState } from "react";
 import axios from "axios";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./calendarStyles.css";
 
-
 export default function PatientAppointmentPage() {
-  const [specialties, setSpecialties] = useState([
-    "kinesiologo",
-    "podologo",
-    "terapeuta",
-    "nutricionista",
-  ]);
+  const [specialties] = useState(["kinesiologo", "podologo", "terapeuta", "nutricionista"]);
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [professionals, setProfessionals] = useState([]);
   const [selectedProfessional, setSelectedProfessional] = useState("");
@@ -23,8 +16,9 @@ export default function PatientAppointmentPage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmationData, setConfirmationData] = useState(null); // Para mostrar la confirmación
 
-
+  // Buscar profesionales por especialidad
   const handleSearch = async () => {
     const token = localStorage.getItem("token");
     if (!selectedSpecialty) {
@@ -47,7 +41,7 @@ export default function PatientAppointmentPage() {
     }
   };
 
-
+  // Obtener horarios disponibles para un profesional
   const fetchSchedules = async (professional_id) => {
     const token = localStorage.getItem("token");
     try {
@@ -62,7 +56,7 @@ export default function PatientAppointmentPage() {
     }
   };
 
-
+  // Seleccionar profesional y cargar horarios
   const handleProfessionalChange = (e) => {
     const professional_id = e.target.value;
     setSelectedProfessional(professional_id);
@@ -73,7 +67,7 @@ export default function PatientAppointmentPage() {
     }
   };
 
-
+  // Validar fechas deshabilitadas en el calendario
   const tileDisabled = ({ date, view }) => {
     if (view === "month") {
       const dayHasAvailableSlots = schedules.some((schedule) => {
@@ -84,13 +78,13 @@ export default function PatientAppointmentPage() {
     }
   };
 
-
+  // Manejar cambio de fecha seleccionada
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setSelectedTimeSlot(null);
   };
 
-
+  // Filtrar horarios disponibles para la fecha seleccionada
   const availableTimeSlots = schedules
     .filter((schedule) => {
       const availableFrom = new Date(schedule.from);
@@ -104,30 +98,26 @@ export default function PatientAppointmentPage() {
       to: new Date(schedule.to),
     }));
 
-
+  // Seleccionar un bloque horario
   const handleTimeSlotSelection = (timeSlot) => {
     setSelectedTimeSlot(timeSlot);
   };
 
-
+  // Confirmar la cita
   const confirmAppointment = async (e) => {
     e.preventDefault();
-
 
     if (!selectedProfessional || !selectedTimeSlot) {
       setMessage("Selecciona un profesional, fecha y horario antes de confirmar.");
       return;
     }
 
-
     const token = localStorage.getItem("token");
     setLoading(true);
 
-
     try {
-      // Solicitar link de pago
-      const paymentResponse = await axios.post(
-        "https://newcareplusback.onrender.com/api/payments/create-payment-link",
+      const response = await axios.post(
+        "https://newcareplusback.onrender.com/api/appointments",
         {
           professional_id: selectedProfessional,
           scheduled_time: selectedTimeSlot.from,
@@ -135,23 +125,18 @@ export default function PatientAppointmentPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-
-      // Redirigir al link de pago generado
-      if (paymentResponse.data.paymentLink) {
-        window.location.href = paymentResponse.data.paymentLink;
-      } else {
-        setMessage("No se pudo generar el link de pago. Intenta nuevamente.");
-      }
+      // Guardar datos de confirmación
+      setConfirmationData(response.data.appointment);
+      setMessage("Cita confirmada con éxito.");
     } catch (error) {
       const errorMsg =
-        error.response?.data?.error || "Error al procesar el pago.";
-      console.error("Error al procesar el pago:", errorMsg);
+        error.response?.data?.error || "Error al confirmar la cita.";
+      console.error("Error al confirmar la cita:", errorMsg);
       setMessage(errorMsg);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="container mx-auto p-4 max-w-screen-lg">
@@ -173,7 +158,6 @@ export default function PatientAppointmentPage() {
           </select>
         </label>
 
-
         <button
           onClick={handleSearch}
           disabled={loading}
@@ -186,7 +170,6 @@ export default function PatientAppointmentPage() {
           {loading ? "Buscando..." : "Buscar Profesionales"}
         </button>
       </div>
-
 
       {professionals.length > 0 && (
         <div className="mt-8">
@@ -206,7 +189,6 @@ export default function PatientAppointmentPage() {
             ))}
           </select>
 
-
           {schedules.length > 0 && (
             <div className="bg-gray-100 p-6 rounded shadow">
               <h4 className="text-xl font-bold mb-2">Horarios Disponibles:</h4>
@@ -217,7 +199,6 @@ export default function PatientAppointmentPage() {
               />
             </div>
           )}
-
 
           {selectedDate && availableTimeSlots.length > 0 && (
             <div className="mt-4">
@@ -248,7 +229,6 @@ export default function PatientAppointmentPage() {
             </div>
           )}
 
-
           {selectedTimeSlot && (
             <button
               onClick={confirmAppointment}
@@ -262,6 +242,14 @@ export default function PatientAppointmentPage() {
               {loading ? "Procesando..." : "Confirmar Cita"}
             </button>
           )}
+        </div>
+      )}
+      {confirmationData && (
+        <div className="bg-green-100 p-4 rounded mt-4">
+          <h4 className="text-lg font-bold">Cita Confirmada</h4>
+          <p><strong>ID:</strong> {confirmationData.id}</p>
+          <p><strong>Profesional:</strong> {confirmationData.professional_id}</p>
+          <p><strong>Horario:</strong> {new Date(confirmationData.scheduled_time).toLocaleString()}</p>
         </div>
       )}
       {message && <p className="text-red-500 mt-4">{message}</p>}
